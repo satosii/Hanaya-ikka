@@ -1,0 +1,9 @@
+/* Global styles */
+.fade-in {
+    transition: opacity 1s, transform 1s;
+}
+
+/* English Font Setting */
+.english-text {
+    font-family: "Cochin", "Baskerville", "Georgia", serif;
+}

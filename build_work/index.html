@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hanaya Ikka</title>
+    <!-- Keep Tailwind CDN for simplicity as per plan, or ideally install it. 
+         Plan said: "Decision: Keep Tailwind CDN in index.html for simplicity as per original, but move custom CSS here."
+    -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Font Settings - kept in head to avoid FOUC or just move to index.css */
+        body {
+            font-family: "Yu Gothic Medium", "Yu Gothic", YuGothic, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>
