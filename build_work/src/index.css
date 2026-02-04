@@ -7,3 +7,104 @@
 .english-text {
     font-family: "Cochin", "Baskerville", "Georgia", serif;
 }
+
+/* React Datepicker Customization */
+.react-datepicker {
+    font-family: "Cochin", "Baskerville", "Georgia", serif !important;
+    border: 1px solid #e7e5e4 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.react-datepicker__header {
+    background-color: #f5f5f4 !important;
+    /* bg-stone-100 */
+    border-bottom: 1px solid #e7e5e4 !important;
+    border-radius: 0 !important;
+    padding-top: 15px !important;
+}
+
+.react-datepicker__current-month {
+    color: #292524 !important;
+    /* text-stone-800 */
+    font-weight: normal !important;
+    letter-spacing: 0.1em;
+}
+
+.react-datepicker__day-name {
+    color: #78716c !important;
+    /* text-stone-500 */
+}
+
+.react-datepicker__day {
+    color: #292524 !important;
+    /* text-stone-800 */
+}
+
+.react-datepicker__day:hover {
+    background-color: #e7e5e4 !important;
+    /* bg-stone-200 */
+    border-radius: 50% !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+    background-color: #292524 !important;
+    /* bg-stone-800 */
+    color: white !important;
+    border-radius: 50% !important;
+}
+
+/* Disabled state - Make it lighter and properly grayed out */
+.react-datepicker__day--disabled {
+    color: #9ca3af !important;
+    /* text-gray-400 - darker than before */
+    background-color: #f3f4f6 !important;
+    /* bg-gray-100 - clear contrast */
+    text-decoration: line-through !important;
+    /* Explicit visual cue */
+    opacity: 0.7 !important;
+    /* Less transparent to ensure visibility */
+    pointer-events: none;
+    border-radius: 0 !important;
+    /* Square for disabled? Or keep circle. Circle is fine. */
+}
+
+/* Specifically for filtered out days (like Wednesdays) vs minDate/maxDate */
+.react-datepicker__day--disabled:hover {
+    background-color: #f3f4f6 !important;
+    color: #9ca3af !important;
+    cursor: not-allowed;
+}
+
+.react-datepicker__day--today {
+    font-weight: bold;
+    color: #292524;
+}
+
+.react-datepicker__navigation-icon::before {
+    border-color: #78716c !important;
+    /* text-stone-500 */
+}
+
+/* Portal Styles for Mobile */
+.react-datepicker__portal-container .react-datepicker__content {
+    background-color: #fff !important;
+    border: 1px solid #e7e5e4 !important;
+    padding: 20px !important;
+}
+
+.react-datepicker__portal-container {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    /* Backdrop */
+    z-index: 9999 !important;
+}
+
+/* Increase touch targets on mobile portal */
+.react-datepicker__portal-container .react-datepicker__day-name,
+.react-datepicker__portal-container .react-datepicker__day,
+.react-datepicker__portal-container .react-datepicker__time-name {
+    width: 2.5rem !important;
+    line-height: 2.5rem !important;
+    margin: 0.2rem !important;
+}

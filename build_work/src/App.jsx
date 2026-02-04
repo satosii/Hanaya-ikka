@@ -11,8 +11,15 @@ import bouquetEnd2 from './assets/bouquet_end_2.jpg';
 import weddingEnd1 from './assets/wedding_end_1.jpg';
 import weddingEnd2 from './assets/wedding_end_2.jpg';
 import weddingEnd3 from './assets/wedding_end_3.jpg';
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { ja } from 'date-fns/locale/ja';
+import { addDays } from 'date-fns';
+
+registerLocale('ja', ja);
 
 const App = () => {
+    // ... (state vars same as before) ...
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [showOrderModal, setShowOrderModal] = useState(false);
@@ -47,15 +54,15 @@ const App = () => {
     // Gallery Data
     const galleryData = {
         Bouquet: [
-            "https://i.imgur.com/wMaeyoI.jpg", // Moved to top (was 3rd)
+            "https://i.imgur.com/wMaeyoI.jpg",
             "https://i.imgur.com/4zC4J4l.jpg",
             "https://i.imgur.com/gEPevmu.jpg",
             bouquetEnd1,
             bouquetEnd2
         ],
         Arrangement: [
-            "https://i.imgur.com/JqfNZ6P.jpg", // Moved to top (was 2nd)
-            arrangementNew, // New image added as 2nd
+            "https://i.imgur.com/JqfNZ6P.jpg",
+            arrangementNew,
             "https://i.imgur.com/kefkYt6.jpg",
             "https://i.imgur.com/NVEhUfC.jpg",
             "https://i.imgur.com/pCYYN6u.jpg",
@@ -65,17 +72,9 @@ const App = () => {
             arrangementEnd3
         ],
         Wedding: [
-            "https://i.imgur.com/B4LVMzt.jpg", // Moved to top (was 5th in original list, or visually 5th?) 
-            // Assuming user meant the image that WAS originally 5th, or is currently 5th in the display. 
-            // In the code I see:
-            // 1. weddingNew
-            // 2. 3l98YKH
-            // 3. NnEC3sF
-            // 4. N48Lazr
-            // 5. B4LVMzt  <-- This one
-            // 6. EyPN77x
-            weddingNew,
             "https://i.imgur.com/3l98YKH.jpg",
+            "https://i.imgur.com/B4LVMzt.jpg",
+            weddingNew,
             "https://i.imgur.com/NnEC3sF.jpg",
             "https://i.imgur.com/N48Lazr.jpg",
             "https://i.imgur.com/EyPN77x.jpg",
@@ -86,12 +85,13 @@ const App = () => {
     };
 
     // Calculate minimum date (3 days from today)
-    const getMinDate = () => {
-        const date = new Date();
-        date.setDate(date.getDate() + 3);
-        return date.toISOString().split('T')[0];
-    };
-    const minDate = getMinDate();
+    // Use date-fns addDays to ensure correct date math
+    // Set time to 00:00:00 to verify against calendar dates (which are usually 00:00:00)
+    const minDate = (() => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return addDays(today, 3);
+    })();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -107,7 +107,6 @@ const App = () => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('opacity-100', 'translate-y-0');
-                        // Clean up any remaining hiding classes if present (though we removed them from init)
                         entry.target.classList.remove('opacity-0', 'translate-y-8');
                     }
                 });
@@ -165,7 +164,6 @@ const App = () => {
         { id: 'outside', label: '市外県外配送', desc: '仙台市外・県外への配送\n＊別途配送料¥1,980〜（サイズにより異なります）' }
     ];
 
-    // 営業時間内の時間選択肢
     const timeOptions = [
         "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"
     ];
@@ -204,32 +202,23 @@ const App = () => {
         setOrderStep(orderStep - 1);
     };
 
-    const handleDateChange = (e) => {
-        const dateStr = e.target.value;
-        if (!dateStr) {
+    const handleDateChange = (date) => {
+        if (!date) {
             setOrderData({ ...orderData, useDate: '' });
             return;
         }
+        // date is already a Date object from DatePicker
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const dateStr = `${year}-${month}-${day}`;
+        setOrderData({ ...orderData, useDate: dateStr });
+    };
 
-        const selectedDate = new Date(dateStr);
-        const minAllowedDate = new Date(minDate);
-
-        selectedDate.setHours(0, 0, 0, 0);
-        minAllowedDate.setHours(0, 0, 0, 0);
-
-        if (selectedDate < minAllowedDate) {
-            alert('本日より3日後以降の日付をお選びください。');
-            setOrderData({ ...orderData, useDate: '' });
-            return;
-        }
-
-        const day = selectedDate.getDay();
-        if (day === 3) { // 3 is Wednesday
-            alert('水曜日は定休日のためお選びいただけません。');
-            setOrderData({ ...orderData, useDate: '' });
-        } else {
-            setOrderData({ ...orderData, useDate: dateStr });
-        }
+    // Filter for DatePicker: return true if date is valid (selectable)
+    const isDateSelectable = (date) => {
+        const day = date.getDay();
+        return day !== 3; // 3 is Wednesday (0=Sun, 1=Mon, ..., 6=Sat)
     };
 
     const generateMessage = () => {
@@ -833,15 +822,24 @@ const App = () => {
                                     <h4 className="text-lg mb-8 tracking-widest text-center">ご利用日・時間</h4>
                                     <div className="max-w-xs mx-auto">
                                         <label className="block text-xs text-stone-500 mb-2 tracking-widest uppercase english-text">Pick up Date</label>
-                                        <input
-                                            type="date"
-                                            min={minDate}
-                                            value={orderData.useDate}
-                                            onChange={handleDateChange}
-                                            className="w-full p-4 border border-stone-300 focus:border-stone-800 outline-none text-stone-700 tracking-widest bg-transparent text-center cursor-pointer english-text"
-                                        />
+                                        <div className="w-full">
+                                            <DatePicker
+                                                selected={orderData.useDate ? new Date(orderData.useDate) : null}
+                                                onChange={handleDateChange}
+                                                minDate={minDate}
+                                                filterDate={isDateSelectable}
+                                                locale="ja"
+                                                dateFormat="yyyy/MM/dd"
+                                                placeholderText="日付を選択してください"
+                                                className="w-full p-4 border border-stone-300 focus:border-stone-800 outline-none text-stone-700 tracking-widest bg-transparent text-center cursor-pointer english-text rounded-none"
+                                                wrapperClassName="w-full"
+                                                onFocus={(e) => e.target.blur()} // Prevent keyboard on mobile
+                                                withPortal // Render as modal on mobile
+                                                portalId="root-portal" // Optional, but good practice
+                                            />
+                                        </div>
                                         <p className="text-xs text-red-500 mt-2 text-center tracking-wide font-bold">
-                                            ※水曜日は定休日です
+                                            ※本日から3日後以降、水曜日（定休）以外を選択可能です
                                         </p>
 
                                         <label className="block text-xs text-stone-500 mt-6 mb-2 tracking-widest uppercase english-text">Pick up Time</label>
@@ -1087,7 +1085,7 @@ const App = () => {
                     ))}
                 </div>
                 <p className="text-[10px] tracking-widest opacity-50 english-text">
-                    © 2025 HANAYA IKKA. ALL RIGHTS RESERVED.
+                    © 2025 HANAYA IKKA. ALL RIGHTS RESERVED. (v1.0.1)
                 </p>
             </footer>
         </div>
