@@ -1085,7 +1085,7 @@ const App = () => {
                     ))}
                 </div>
                 <p className="text-[10px] tracking-widest opacity-50 english-text">
-                    © 2025 HANAYA IKKA. ALL RIGHTS RESERVED. (v1.0.1)
+                    © 2026 HANAYA IKKA. ALL RIGHTS RESERVED. (v1.0.2)
                 </p>
             </footer>
         </div>
