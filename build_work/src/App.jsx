@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, MapPin, Phone, Clock, ChevronRight, ChevronLeft, Check, Mail, CreditCard } from 'lucide-react';
+import { Menu, X, MapPin, Phone, Clock, ChevronRight, ChevronLeft, Check, Mail, CreditCard, Copy } from 'lucide-react';
 
 import weddingNew from './assets/wedding_new.jpg';
 import arrangementNew from './assets/arrangement_new.jpg';
@@ -23,6 +23,7 @@ const App = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [showOrderModal, setShowOrderModal] = useState(false);
+    const [copySuccess, setCopySuccess] = useState(false);
 
     // Gallery Modal State
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -282,11 +283,25 @@ const App = () => {
     };
 
     const handleMailSend = () => {
-        const message = generateMessage();
+        const message = generateMessage().replace(/\n/g, '\r\n'); // Ensure CRLF for broad compatibility
         const subject = "オーダー注文";
         const body = encodeURIComponent(message);
-        window.location.href = `mailto:mail@ikka-hanaya.jp?subject=${subject}&body=${body}`;
+        // Use a hidden anchor tag click to better support mobile
+        const link = document.createElement('a');
+        link.href = `mailto:mail@ikka-hanaya.jp?subject=${subject}&body=${body}`;
+        link.click();
         setShowOrderModal(false);
+    };
+
+    const handleCopyContent = async () => {
+        const message = generateMessage();
+        try {
+            await navigator.clipboard.writeText(message);
+            setCopySuccess(true);
+            setTimeout(() => setCopySuccess(false), 2000);
+        } catch (err) {
+            console.error('Failed to copy text: ', err);
+        }
     };
 
     const isStepComplete = () => {
@@ -573,7 +588,7 @@ const App = () => {
                         </a>
 
                         <a
-                            href="mailto:mail@ikka-hanaya.jp"
+                            href="mailto:mail@ikka-hanaya.jp?subject=ご相談&body=お名前：%0D%0Aご用件：%0D%0A"
                             className="w-full md:w-64 h-14 border border-stone-400 text-stone-600 flex items-center justify-center gap-2 tracking-widest hover:bg-stone-400 hover:text-white transition-all hover:border-stone-400 bg-transparent"
                         >
                             <Mail size={16} />
@@ -1036,6 +1051,25 @@ const App = () => {
                                         >
                                             <Mail size={18} /> メールで送信
                                         </button>
+                                        <button
+                                            onClick={handleCopyContent}
+                                            className="w-full py-4 bg-stone-200 text-stone-600 hover:bg-stone-300 transition-all tracking-widest flex items-center justify-center gap-2 rounded relative"
+                                        >
+                                            {copySuccess ? (
+                                                <>
+                                                    <Check size={18} className="text-green-600" />
+                                                    <span className="text-green-600">コピーしました！</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Copy size={18} /> 文章をコピー
+                                                </>
+                                            )}
+                                        </button>
+                                        <div className="text-[10px] text-stone-400 text-center leading-relaxed">
+                                            ※メールが起動しない場合、「文章をコピー」を押してから<br />
+                                            ご自身のメールアプリに貼り付けて送信してください。
+                                        </div>
                                     </div>
                                 </div>
                             )}
