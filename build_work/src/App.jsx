@@ -91,7 +91,7 @@ const App = () => {
     const minDate = (() => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        return addDays(today, 3);
+        return today;
     })();
 
     useEffect(() => {
@@ -134,6 +134,7 @@ const App = () => {
     ];
 
     const budgets = [
+        { id: '3300', label: '¥3,300' },
         { id: '5500', label: '¥5,500' },
         { id: '7700', label: '¥7,700' },
         { id: '11000', label: '¥11,000' },
@@ -161,8 +162,8 @@ const App = () => {
 
     const deliveryOptions = [
         { id: 'pickup', label: '来店', desc: '店頭でのお受け取り' },
-        { id: 'sendai', label: '配達（仙台市内）', desc: '仙台市内への配送\n※別途配達料 ¥880' },
-        { id: 'outside', label: '市外県外配送', desc: '仙台市外・県外への配送\n＊別途配送料¥1,980〜（サイズにより異なります）' }
+        { id: 'sendai', label: '配達（仙台市内）', desc: '仙台市内への配達\n＊別途配達料 ¥880\n＊¥11,000以上は配達料無料' },
+        { id: 'outside', label: '市外県外配送', desc: '仙台市外・県外への配送\n＊別途配送料¥1,760〜（サイズにより異なります）' }
     ];
 
     const timeOptions = [
@@ -219,7 +220,16 @@ const App = () => {
     // Filter for DatePicker: return true if date is valid (selectable)
     const isDateSelectable = (date) => {
         const day = date.getDay();
-        return day !== 3; // 3 is Wednesday (0=Sun, 1=Mon, ..., 6=Sat)
+        if (day === 3) return false; // Wednesday
+
+        // Sunday check: Advance reservation only (No same-day orders)
+        if (day === 0) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (date.getTime() === today.getTime()) return false;
+        }
+
+        return true;
     };
 
     const generateMessage = () => {
@@ -272,7 +282,7 @@ const App = () => {
 メッセージカード（立て札）: ${messageCardInfo}
 受取方法: ${deliveryLabel}${deliveryDetails}
 
-※ご注文の詳細確認のため、追ってご連絡させていただきます。`;
+※ご注文確認後、追ってご連絡させていただきます。`;
     };
 
     const handleLineSend = () => {
@@ -549,9 +559,11 @@ const App = () => {
                     <div className="mb-12 fade-in transition-all duration-1000">
                         <h2 className="text-4xl md:text-5xl mb-16 tracking-widest font-light english-text">Order</h2>
                         <p className="text-sm leading-8 text-stone-600 tracking-wide font-light">
-                            お花のご注文は以下の「オーダー」ボタンより承っております。<br />
-                            クレジット等、オンライン決済をご希望の際はWeb shopをご利用ください。<br />
-                            ウェディングのご相談や、事前に内容をご相談したい方は「LINEで相談」か「メールで相談」をお選びください。
+                            ・お花のご注文は以下の「クイックオーダー」ボタンより承っております。<br />
+                            ※お支払い方法（ご来店、事前お振込み、法人様ご請求書発行）<br />
+                            ・クレジット等、オンライン決済をご希望の際はWeb shopをご利用ください。<br />
+                            （表記以外のご予算も対応可能です）<br />
+                            ・ウェディングのご相談や、事前に内容をご相談したい方は「LINEで相談」か「メールで相談」をお選びください。
                         </p>
                     </div>
 
@@ -561,10 +573,10 @@ const App = () => {
                             className="group relative w-full md:w-64 h-14 bg-stone-800 text-white overflow-hidden transition-all hover:bg-stone-700"
                         >
                             <span className="absolute inset-0 flex items-center justify-center gap-2 tracking-widest transition-transform group-hover:-translate-y-full">
-                                オーダー <ChevronRight size={16} />
+                                クイックオーダー <ChevronRight size={16} />
                             </span>
                             <span className="absolute inset-0 flex items-center justify-center gap-2 tracking-widest translate-y-full transition-transform group-hover:translate-y-0 english-text">
-                                START ORDER
+                                QUICK ORDER
                             </span>
                         </button>
 
@@ -596,11 +608,7 @@ const App = () => {
                         </a>
                     </div>
 
-                    <div className="mt-12 space-y-4 fade-in transition-all duration-1000 delay-300">
-                        <p className="text-xs text-stone-500 tracking-wider">
-                            お急ぎの場合はお電話（<span className="english-text">022-397-7552</span>）にてご連絡ください。
-                        </p>
-                    </div>
+
                 </div>
             </section>
 
@@ -622,7 +630,7 @@ const App = () => {
                                             仙台市青葉区一番町1-5-31<br />
                                             MIGNON一番町ビル3F−A
                                         </p>
-                                        <p className="text-xs text-stone-500 mt-2 tracking-wider">※完全予約制となっております</p>
+                                        <p className="text-xs text-stone-500 mt-2 tracking-wider">※事前予約制となっております　※単品の販売はしておりません</p>
                                     </div>
                                 </div>
 
@@ -753,7 +761,7 @@ const App = () => {
                                                 autoFocus
                                             />
                                             <p className="text-xs text-stone-500 mt-2 tracking-wide text-center">
-                                                （¥4,000〜）別途消費税が加算されます。
+                                                （¥3,000〜）別途消費税が加算されます。
                                             </p>
                                         </div>
                                     ) : (
@@ -761,6 +769,10 @@ const App = () => {
                                             ※税込価格となります
                                         </p>
                                     )}
+                                    <p className="text-xs text-stone-400 text-center mt-2 tracking-wide">
+                                        ※アレンジメントは¥4,400〜<br />
+                                        ※スタンド花は¥33,000〜（1段のみ）
+                                    </p>
                                 </div>
                             )}
 
@@ -826,7 +838,8 @@ const App = () => {
                                         />
                                     </div>
                                     <p className="text-xs text-red-500 mt-4 text-center tracking-wide font-bold">
-                                        ※色合いのご指定は不可となります。
+                                        ※色合いや品種のご指定は不可となります。<br />
+                                        ※当日のご注文はおまかせとなります。
                                     </p>
                                 </div>
                             )}
@@ -854,7 +867,8 @@ const App = () => {
                                             />
                                         </div>
                                         <p className="text-xs text-red-500 mt-2 text-center tracking-wide font-bold">
-                                            ※本日から3日後以降、水曜日（定休）以外を選択可能です
+                                            ※水曜定休となります<br />
+                                            ※日曜日は事前予約分のみのご対応となります<br />（当日のご注文不可）
                                         </p>
 
                                         <label className="block text-xs text-stone-500 mt-6 mb-2 tracking-widest uppercase english-text">Pick up Time</label>
@@ -869,10 +883,7 @@ const App = () => {
                                             ))}
                                         </select>
 
-                                        <p className="text-xs text-stone-400 mt-6 text-center tracking-wide leading-relaxed">
-                                            ※本日より3日後以降の日付をご指定ください。<br />
-                                            お急ぎの場合はお電話にてご相談ください。
-                                        </p>
+
                                     </div>
                                 </div>
                             )}
@@ -1099,7 +1110,7 @@ const App = () => {
                             ) : null}
                         </div>
                     </div>
-                </div>
+                </div >
             )}
 
             {/* Footer */}
@@ -1122,7 +1133,7 @@ const App = () => {
                     © 2026 HANAYA IKKA. ALL RIGHTS RESERVED. (v1.0.2)
                 </p>
             </footer>
-        </div>
+        </div >
     );
 };
 
