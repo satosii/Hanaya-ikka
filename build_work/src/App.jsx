@@ -8,6 +8,7 @@ import arrangementEnd2 from './assets/arrangement_end_2.jpg';
 import arrangementEnd3 from './assets/arrangement_end_3.jpg';
 import bouquetEnd1 from './assets/bouquet_end_1.jpg';
 import bouquetEnd2 from './assets/bouquet_end_2.jpg';
+import bouquetEnd3 from './assets/bouquet_end_3.jpg';
 import weddingEnd1 from './assets/wedding_end_1.jpg';
 import weddingEnd2 from './assets/wedding_end_2.jpg';
 import weddingEnd3 from './assets/wedding_end_3.jpg';
@@ -59,7 +60,8 @@ const App = () => {
             "https://i.imgur.com/4zC4J4l.jpg",
             "https://i.imgur.com/gEPevmu.jpg",
             bouquetEnd1,
-            bouquetEnd2
+            bouquetEnd2,
+            bouquetEnd3
         ],
         Arrangement: [
             "https://i.imgur.com/JqfNZ6P.jpg",
