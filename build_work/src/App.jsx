@@ -284,7 +284,8 @@ const App = () => {
 メッセージカード（立て札）: ${messageCardInfo}
 受取方法: ${deliveryLabel}${deliveryDetails}
 
-※ご注文確認後、追ってご連絡させていただきます。`;
+※ご注文確認後、追ってご連絡させていただきます。
+※こちらからの返信をもってご予約確定となります。`;
     };
 
     const handleLineSend = () => {
