@@ -1125,7 +1125,7 @@ const App = () => {
                     className="h-10 w-auto mb-8 brightness-0 invert opacity-90 object-contain"
                     referrerPolicy="no-referrer"
                 />
-                <div className="flex justify-center gap-8 mb-12 text-xs tracking-widest">
+                <div className="flex justify-center flex-wrap gap-x-6 gap-y-4 md:gap-8 mb-12 text-xs tracking-widest px-4">
                     {['concept', 'services', 'gallery', 'order', 'info'].map((item) => (
                         <button key={item} onClick={() => scrollToSection(item)} className="hover:text-white uppercase english-text">
                             {item === 'info' ? 'access' : item}
@@ -1133,7 +1133,7 @@ const App = () => {
                     ))}
                 </div>
                 <p className="text-[10px] tracking-widest opacity-50 english-text">
-                    © 2026 HANAYA IKKA. ALL RIGHTS RESERVED. (v1.0.2)
+                    © 2026 HANAYA IKKA. ALL RIGHTS RESERVED. (v1.0.3)
                 </p>
             </footer>
         </div >
