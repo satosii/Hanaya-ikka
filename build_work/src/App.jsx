@@ -20,6 +20,8 @@ import { addDays } from 'date-fns';
 import bouquet1 from './assets/bouquet_1.jpg';
 import bouquet2 from './assets/bouquet_2.jpg';
 import bouquet3 from './assets/bouquet_3.jpg';
+import bouquet4 from './assets/bouquet_4.jpg';
+import bouquet5 from './assets/bouquet_5.jpg';
 import arrangement1 from './assets/arrangement_1.jpg';
 import arrangement2 from './assets/arrangement_2.jpg';
 import arrangement3 from './assets/arrangement_3.jpg';
@@ -74,6 +76,8 @@ const App = () => {
     const galleryData = {
         Bouquet: [
             bouquet1,
+            bouquet4,
+            bouquet5,
             bouquet2,
             bouquet3,
             bouquetEnd1,
