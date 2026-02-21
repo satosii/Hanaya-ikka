@@ -17,6 +17,23 @@ import "react-datepicker/dist/react-datepicker.css";
 import { ja } from 'date-fns/locale/ja';
 import { addDays } from 'date-fns';
 
+import bouquet1 from './assets/bouquet_1.jpg';
+import bouquet2 from './assets/bouquet_2.jpg';
+import bouquet3 from './assets/bouquet_3.jpg';
+import arrangement1 from './assets/arrangement_1.jpg';
+import arrangement2 from './assets/arrangement_2.jpg';
+import arrangement3 from './assets/arrangement_3.jpg';
+import arrangement4 from './assets/arrangement_4.jpg';
+import arrangement5 from './assets/arrangement_5.jpg';
+import wedding1 from './assets/wedding_1.jpg';
+import wedding2 from './assets/wedding_2.jpg';
+import wedding3 from './assets/wedding_3.jpg';
+import wedding4 from './assets/wedding_4.jpg';
+import wedding5 from './assets/wedding_5.jpg';
+import logoIkka from './assets/logo_ikka.png';
+import heroText from './assets/hero_text.png';
+import heroFlower from './assets/hero_flower.jpeg';
+
 registerLocale('ja', ja);
 
 const App = () => {
@@ -56,31 +73,31 @@ const App = () => {
     // Gallery Data
     const galleryData = {
         Bouquet: [
-            "https://i.imgur.com/wMaeyoI.jpg",
-            "https://i.imgur.com/4zC4J4l.jpg",
-            "https://i.imgur.com/gEPevmu.jpg",
+            bouquet1,
+            bouquet2,
+            bouquet3,
             bouquetEnd1,
             bouquetEnd2,
             bouquetEnd3
         ],
         Arrangement: [
-            "https://i.imgur.com/JqfNZ6P.jpg",
+            arrangement1,
             arrangementNew,
-            "https://i.imgur.com/kefkYt6.jpg",
-            "https://i.imgur.com/NVEhUfC.jpg",
-            "https://i.imgur.com/pCYYN6u.jpg",
-            "https://i.imgur.com/NlR50gt.jpg",
+            arrangement2,
+            arrangement3,
+            arrangement4,
+            arrangement5,
             arrangementEnd1,
             arrangementEnd2,
             arrangementEnd3
         ],
         Wedding: [
-            "https://i.imgur.com/3l98YKH.jpg",
-            "https://i.imgur.com/B4LVMzt.jpg",
+            wedding1,
+            wedding2,
             weddingNew,
-            "https://i.imgur.com/NnEC3sF.jpg",
-            "https://i.imgur.com/N48Lazr.jpg",
-            "https://i.imgur.com/EyPN77x.jpg",
+            wedding3,
+            wedding4,
+            wedding5,
             weddingEnd1,
             weddingEnd2,
             weddingEnd3
@@ -351,7 +368,7 @@ const App = () => {
 
                     {/* Logo Image in Navigation - Left aligned */}
                     <div className="cursor-pointer z-50" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-                        <img src="https://i.imgur.com/mU4Jon8.png" alt="一花" className="w-16 md:w-24 h-auto object-contain" referrerPolicy="no-referrer" />
+                        <img src={logoIkka} alt="一花" className="w-16 md:w-24 h-auto object-contain" />
                     </div>
 
                     {/* Desktop Menu - Right aligned */}
@@ -391,19 +408,17 @@ const App = () => {
 
                 <div className="relative text-center z-10 px-6 flex flex-col items-center">
                     <img
-                        src="https://i.imgur.com/q7cXpmM.png"
+                        src={heroText}
                         alt="HANAYA IKKA"
                         className="w-40 md:w-60 h-auto fade-in transition-all duration-1000 delay-200 object-contain"
-                        referrerPolicy="no-referrer"
                     />
 
                     {/* Inserted Image - Increased Size & Changed Source */}
                     <div className="mt-8 mb-8 fade-in transition-all duration-1000 delay-500">
                         <img
-                            src="https://i.imgur.com/74ib8gN.jpeg"
+                            src={heroFlower}
                             alt="Flower"
                             className="w-56 md:w-80 h-auto object-contain rounded-sm"
-                            referrerPolicy="no-referrer"
                         />
                     </div>
 
@@ -513,7 +528,6 @@ const App = () => {
                                     src={images[0]}
                                     alt={category}
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                    referrerPolicy="no-referrer"
                                 />
                                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 text-white transition-opacity duration-500 hover:opacity-100">
                                     <span className="english-text tracking-widest text-2xl italic mb-2">{category}</span>
@@ -1120,10 +1134,9 @@ const App = () => {
             <footer className="py-20 px-6 bg-stone-800 text-stone-400 text-center flex flex-col items-center">
                 {/* Footer Logo Image with inverted brightness for dark background */}
                 <img
-                    src="https://i.imgur.com/mU4Jon8.png"
+                    src={logoIkka}
                     alt="一花"
                     className="h-10 w-auto mb-8 brightness-0 invert opacity-90 object-contain"
-                    referrerPolicy="no-referrer"
                 />
                 <div className="flex justify-center flex-wrap gap-x-6 gap-y-4 md:gap-8 mb-12 text-xs tracking-widest px-4">
                     {['concept', 'services', 'gallery', 'order', 'info'].map((item) => (
