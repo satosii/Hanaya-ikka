@@ -12,6 +12,9 @@ import bouquetEnd3 from './assets/bouquet_end_3.jpg';
 import weddingEnd1 from './assets/wedding_end_1.jpg';
 import weddingEnd2 from './assets/wedding_end_2.jpg';
 import weddingEnd3 from './assets/wedding_end_3.jpg';
+import weddingAdd1 from './assets/wedding_add_1.jpg';
+import weddingAdd2 from './assets/wedding_add_2.jpg';
+import arrangementAdd1 from './assets/arrangement_add_1.jpg';
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ja } from 'date-fns/locale/ja';
@@ -86,6 +89,7 @@ const App = () => {
         ],
         Arrangement: [
             arrangement1,
+            arrangementAdd1,
             arrangementNew,
             arrangement2,
             arrangement3,
@@ -97,6 +101,8 @@ const App = () => {
         ],
         Wedding: [
             wedding1,
+            weddingAdd1,
+            weddingAdd2,
             wedding2,
             weddingNew,
             wedding3,
@@ -242,6 +248,18 @@ const App = () => {
 
     // Filter for DatePicker: return true if date is valid (selectable)
     const isDateSelectable = (date) => {
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const dayOfMonth = date.getDate();
+
+        // Special opening days: 2026/03/25 and 2026/04/01
+        if (year === 2026 && (
+            (month === 3 && dayOfMonth === 25) ||
+            (month === 4 && dayOfMonth === 1)
+        )) {
+            return true;
+        }
+
         const day = date.getDay();
         if (day === 3) return false; // Wednesday
 
@@ -660,6 +678,7 @@ const App = () => {
                                     <div className="text-stone-700 tracking-wide">
                                         <p className="mb-1">11:00 - 18:00</p>
                                         <p>定休日：水曜日</p>
+                                        <p className="text-xs mt-1">＊3/25,4/1は営業いたします</p>
                                     </div>
                                 </div>
 
@@ -888,7 +907,7 @@ const App = () => {
                                             />
                                         </div>
                                         <p className="text-xs text-red-500 mt-2 text-center tracking-wide font-bold">
-                                            ※水曜定休となります<br />
+                                            ※水曜定休となります（＊3/25,4/1は営業いたします）<br />
                                             ※日曜日は事前予約分のみのご対応となります<br />（当日のご注文不可）
                                         </p>
 
