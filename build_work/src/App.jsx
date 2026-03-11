@@ -42,6 +42,9 @@ import heroFlower from './assets/hero_flower.jpeg';
 registerLocale('ja', ja);
 
 const App = () => {
+    // Special business period: until the end of 2026/04/01
+    const isSpecialBusinessPeriod = new Date() <= new Date('2026-04-01T23:59:59');
+
     // ... (state vars same as before) ...
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
@@ -253,7 +256,7 @@ const App = () => {
         const dayOfMonth = date.getDate();
 
         // Special opening days: 2026/03/25 and 2026/04/01
-        if (year === 2026 && (
+        if (isSpecialBusinessPeriod && year === 2026 && (
             (month === 3 && dayOfMonth === 25) ||
             (month === 4 && dayOfMonth === 1)
         )) {
@@ -678,7 +681,7 @@ const App = () => {
                                     <div className="text-stone-700 tracking-wide">
                                         <p className="mb-1">11:00 - 18:00</p>
                                         <p>定休日：水曜日</p>
-                                        <p className="text-xs mt-1">＊3/25,4/1は営業いたします</p>
+                                        {isSpecialBusinessPeriod && <p className="text-xs mt-1">＊3/25,4/1は営業いたします</p>}
                                     </div>
                                 </div>
 
@@ -907,7 +910,7 @@ const App = () => {
                                             />
                                         </div>
                                         <p className="text-xs text-red-500 mt-2 text-center tracking-wide font-bold">
-                                            ※水曜定休となります（＊3/25,4/1は営業いたします）<br />
+                                            ※水曜定休となります{isSpecialBusinessPeriod && "（＊3/25,4/1は営業いたします）"}<br />
                                             ※日曜日は事前予約分のみのご対応となります<br />（当日のご注文不可）
                                         </p>
 
