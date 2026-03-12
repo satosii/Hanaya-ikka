@@ -925,6 +925,9 @@ const App = () => {
                                                 <option key={time} value={time}>{time}</option>
                                             ))}
                                         </select>
+                                        <p className="text-xs text-red-500 mt-2 text-center tracking-wide font-bold">
+                                            ＊贈り物の際は必ずご在宅をご確認の上ご指定ください
+                                        </p>
 
 
                                     </div>
