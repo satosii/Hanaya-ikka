@@ -262,6 +262,10 @@ const App = () => {
             return true;
         }
 
+        if (month === 5 && (dayOfMonth === 9 || dayOfMonth === 10)) {
+            return false;
+        }
+
         const day = date.getDay();
         if (day === 3) return false; // Wednesday
 
@@ -604,7 +608,8 @@ const App = () => {
                             ※お支払い方法（ご来店、事前お振込み、法人様ご請求書発行）<br />
                             ・クレジット等、オンライン決済をご希望の際はWeb shopをご利用ください。<br />
                             （掲載以外のご予算も対応可能です）<br />
-                            ・ウェディングのご相談や、事前に内容をご相談したい方は「LINEで相談」か「メールで相談」をお選びください。
+                            ・ウェディングのご相談や、事前に内容をご相談したい方は「LINEで相談」か「メールで相談」をお選びください。<br />
+                            <span className="text-red-500">＊母の日のオーダーは現在準備中となります。今しばらくお待ちください＊</span>
                         </p>
                     </div>
 
@@ -925,7 +930,8 @@ const App = () => {
                                             ))}
                                         </select>
                                         <p className="text-xs text-red-500 mt-2 text-center tracking-wide font-bold">
-                                            ＊贈り物の際は必ずご在宅をご確認の上ご指定ください
+                                            ＊贈り物の際は必ずご在宅をご確認の上ご指定ください<br />
+                                            ＊時間外をご希望の際は事前にご相談ください
                                         </p>
 
 
