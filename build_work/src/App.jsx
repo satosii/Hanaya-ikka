@@ -53,9 +53,13 @@ const App = () => {
 
     // Gallery Modal State
     const [selectedCategory, setSelectedCategory] = useState(null);
+    const [showTokushoho, setShowTokushoho] = useState(false);
 
+    const [orderType, setOrderType] = useState('quick'); // 'quick' | 'mothers_day'
+    const maxSteps = 8;
     const [orderStep, setOrderStep] = useState(1);
     const [orderData, setOrderData] = useState({
+        paymentConfirmed: false,
         purpose: '',
         purposeOther: '',
         budget: '',
@@ -69,6 +73,7 @@ const App = () => {
         hasMessageCard: '',
         messageCardText: '',
         delivery: '',
+        confirmed: false, // For Mother's Day step 6
         // Detailed contact info
         senderName: '',
         senderPhone: '',
@@ -156,6 +161,21 @@ const App = () => {
         setIsMenuOpen(false);
     };
 
+    const mothersDayBudgets = [
+        { id: '5500', label: '¥5,500' },
+        { id: '7700', label: '¥7,700' },
+        { id: '11000', label: '¥11,000' },
+        { id: 'other', label: 'その他' }
+    ];
+
+    const mothersDayPickupTimes = [
+        "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"
+    ];
+
+    const mothersDayOutsideTimes = [
+        "午前中", "14〜16時", "16〜18時", "18〜20時", "19〜21時"
+    ];
+
     const purposes = [
         { id: 'celebration', label: 'お祝い', english: 'Celebration' },
         { id: 'condolence', label: 'お供え', english: 'Condolence' },
@@ -195,17 +215,19 @@ const App = () => {
     const deliveryOptions = [
         { id: 'pickup', label: '来店', desc: '店頭でのお受け取り' },
         { id: 'sendai', label: '配達（仙台市内）', desc: '仙台市内への配達\n＊別途配達料 ¥880\n＊¥11,000以上は配達料無料' },
-        { id: 'outside', label: '市外県外配送', desc: '仙台市外・県外への配送\n＊別途配送料¥1,760〜（サイズにより異なります）' }
+        { id: 'outside', label: '市外県外配送', desc: '仙台市外・県外への配送\n＊別途配送料¥1,980〜（サイズにより異なります）' }
     ];
 
     const timeOptions = [
         "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"
     ];
 
-    const handleOrderStart = () => {
+    const handleOrderStart = (type = 'quick') => {
+        setOrderType(type);
         setShowOrderModal(true);
         setOrderStep(1);
         setOrderData({
+            paymentConfirmed: false,
             purpose: '',
             purposeOther: '',
             budget: '',
@@ -219,6 +241,7 @@ const App = () => {
             hasMessageCard: '',
             messageCardText: '',
             delivery: '',
+            confirmed: false,
             senderName: '',
             senderPhone: '',
             senderAddress: '',
@@ -280,22 +303,6 @@ const App = () => {
     };
 
     const generateMessage = () => {
-        const purposeLabel = orderData.purpose === 'other' ? `その他（${orderData.purposeOther}）` : purposes.find(p => p.id === orderData.purpose)?.label;
-
-        let budgetLabel = '';
-        if (orderData.budget === 'other') {
-            budgetLabel = `その他（${orderData.budgetOther}）`;
-        } else {
-            budgetLabel = budgets.find(b => b.id === orderData.budget)?.label;
-        }
-
-        const typeLabel = orderData.type === 'other' ? `その他（${orderData.typeOther}）` : types.find(t => t.id === orderData.type)?.label;
-        const imageLabel = images.find(i => i.id === orderData.image)?.label || '';
-        const imageDetail = orderData.imageOther ? `\nイメージ詳細: ${orderData.imageOther}` : '';
-
-        const deliveryLabel = deliveryOptions.find(d => d.id === orderData.delivery)?.label;
-        const messageCardInfo = orderData.hasMessageCard === 'yes' ? `あり\nメッセージ内容：${orderData.messageCardText}` : 'なし';
-
         let deliveryDetails = '';
         if (orderData.delivery === 'sendai' || orderData.delivery === 'outside') {
             deliveryDetails = `
@@ -318,6 +325,56 @@ const App = () => {
 電話番号: ${orderData.senderPhone}
 ----------------`;
         }
+
+        const deliveryLabel = deliveryOptions.find(d => d.id === orderData.delivery)?.label;
+
+        if (orderType === 'mothers_day') {
+            let budgetLabel = '';
+            if (orderData.budget === 'other') {
+                budgetLabel = `その他（${orderData.budgetOther}）`;
+            } else {
+                budgetLabel = mothersDayBudgets.find(b => b.id === orderData.budget)?.label || '';
+            }
+
+            const typeLabel = orderData.type === 'bouquet' ? '花束' : 'アレンジメント';
+            const useDateLabel = { '5/9': '5/9 (土)', '5/10': '5/10 (日)' }[orderData.useDate] || orderData.useDate;
+            const messageCardInfo = orderData.hasMessageCard === 'yes' ? `あり\nメッセージ内容：${orderData.messageCardText}` : 'なし（Thanks Momのカードをおつけします）';
+
+            let timeInfo = '';
+            if (orderData.delivery === 'pickup' && orderData.useTime) {
+                timeInfo = `\nご来店時間: ${orderData.useTime}`;
+            } else if (orderData.delivery === 'outside' && orderData.useTime) {
+                timeInfo = `\n配送希望時間: ${orderData.useTime}`;
+            }
+
+            return `【Mother's Day】
+
+用途: 母の日
+予算: ${budgetLabel}
+種類: ${typeLabel}
+ご利用日: ${useDateLabel}
+メッセージカード: ${messageCardInfo}
+受取方法: ${deliveryLabel}${timeInfo}${deliveryDetails}
+
+※確認事項に同意済み
+※ご注文確認後、追ってご連絡させていただきます。
+※こちらからの返信をもってご予約確定となります。`;
+        }
+
+        const purposeLabel = orderData.purpose === 'other' ? `その他（${orderData.purposeOther}）` : purposes.find(p => p.id === orderData.purpose)?.label;
+
+        let budgetLabel = '';
+        if (orderData.budget === 'other') {
+            budgetLabel = `その他（${orderData.budgetOther}）`;
+        } else {
+            budgetLabel = budgets.find(b => b.id === orderData.budget)?.label;
+        }
+
+        const typeLabel = orderData.type === 'other' ? `その他（${orderData.typeOther}）` : types.find(t => t.id === orderData.type)?.label;
+        const imageLabel = images.find(i => i.id === orderData.image)?.label || '';
+        const imageDetail = orderData.imageOther ? `\nイメージ詳細: ${orderData.imageOther}` : '';
+
+        const messageCardInfo = orderData.hasMessageCard === 'yes' ? `あり\nメッセージ内容：${orderData.messageCardText}` : 'なし';
 
         return `【Hanaya ikka オーダー】
 
@@ -363,28 +420,63 @@ const App = () => {
     };
 
     const isStepComplete = () => {
-        switch (orderStep) {
-            case 1: return orderData.purpose !== '' && (orderData.purpose !== 'other' || orderData.purposeOther !== '');
-            case 2: return orderData.budget !== '' && (orderData.budget !== 'other' || orderData.budgetOther !== '');
-            case 3: return orderData.type !== '' && (orderData.type !== 'other' || orderData.typeOther !== '');
-            case 4: return orderData.image !== '';
-            case 5: return orderData.useDate !== '' && orderData.useTime !== '';
-            case 6: return orderData.hasMessageCard !== '' && (orderData.hasMessageCard === 'no' || orderData.messageCardText !== '');
-            case 7:
-                if (!orderData.delivery) return false;
-                if (orderData.delivery === 'pickup') {
-                    return orderData.senderName !== '' && orderData.senderPhone !== '';
-                }
-                if (orderData.delivery === 'sendai' || orderData.delivery === 'outside') {
-                    return orderData.senderName !== '' &&
-                        orderData.senderPhone !== '' &&
-                        orderData.senderAddress !== '' &&
-                        orderData.recipientName !== '' &&
-                        orderData.recipientPhone !== '' &&
-                        orderData.recipientAddress !== '';
-                }
-                return false;
-            default: return false;
+        if (orderType === 'mothers_day') {
+            switch (orderStep) {
+                case 1: return orderData.paymentConfirmed === true;
+                case 2: return orderData.budget !== '' && (orderData.budget !== 'other' || orderData.budgetOther !== '');
+                case 3: return orderData.type !== '';
+                case 4: return orderData.useDate !== '';
+                case 5: return orderData.hasMessageCard !== '' && (orderData.hasMessageCard === 'no' || orderData.messageCardText !== '');
+                case 6:
+                    if (!orderData.delivery) return false;
+                    if (orderData.delivery === 'pickup') {
+                        return orderData.senderName !== '' && orderData.senderPhone !== '' && orderData.useTime !== '';
+                    }
+                    if (orderData.delivery === 'sendai') {
+                        return orderData.senderName !== '' &&
+                            orderData.senderPhone !== '' &&
+                            orderData.senderAddress !== '' &&
+                            orderData.recipientName !== '' &&
+                            orderData.recipientPhone !== '' &&
+                            orderData.recipientAddress !== '';
+                    }
+                    if (orderData.delivery === 'outside') {
+                        return orderData.senderName !== '' &&
+                            orderData.senderPhone !== '' &&
+                            orderData.senderAddress !== '' &&
+                            orderData.recipientName !== '' &&
+                            orderData.recipientPhone !== '' &&
+                            orderData.recipientAddress !== '' &&
+                            orderData.useTime !== '';
+                    }
+                    return false;
+                case 7: return orderData.confirmed === true;
+                default: return false;
+            }
+        } else {
+            switch (orderStep) {
+                case 1: return orderData.purpose !== '' && (orderData.purpose !== 'other' || orderData.purposeOther !== '');
+                case 2: return orderData.budget !== '' && (orderData.budget !== 'other' || orderData.budgetOther !== '');
+                case 3: return orderData.type !== '' && (orderData.type !== 'other' || orderData.typeOther !== '');
+                case 4: return orderData.image !== '';
+                case 5: return orderData.useDate !== '' && orderData.useTime !== '';
+                case 6: return orderData.hasMessageCard !== '' && (orderData.hasMessageCard === 'no' || orderData.messageCardText !== '');
+                case 7:
+                    if (!orderData.delivery) return false;
+                    if (orderData.delivery === 'pickup') {
+                        return orderData.senderName !== '' && orderData.senderPhone !== '';
+                    }
+                    if (orderData.delivery === 'sendai' || orderData.delivery === 'outside') {
+                        return orderData.senderName !== '' &&
+                            orderData.senderPhone !== '' &&
+                            orderData.senderAddress !== '' &&
+                            orderData.recipientName !== '' &&
+                            orderData.recipientPhone !== '' &&
+                            orderData.recipientAddress !== '';
+                    }
+                    return false;
+                default: return false;
+            }
         }
     };
 
@@ -609,13 +701,24 @@ const App = () => {
                             ・クレジット等、オンライン決済をご希望の際はWeb shopをご利用ください。<br />
                             （掲載以外のご予算も対応可能です）<br />
                             ・ウェディングのご相談や、事前に内容をご相談したい方は「LINEで相談」か「メールで相談」をお選びください。<br />
-                            <span className="text-red-500">＊母の日のオーダーは現在準備中となります。今しばらくお待ちください＊</span>
                         </p>
                     </div>
 
                     <div className="flex flex-col gap-4 justify-center items-center fade-in transition-all duration-1000 delay-200">
                         <button
-                            onClick={handleOrderStart}
+                            onClick={() => handleOrderStart('mothers_day')}
+                            className="group relative w-full md:w-64 h-14 bg-[#B68D8E] text-white overflow-hidden transition-all hover:bg-[#976d6f]"
+                        >
+                            <span className="absolute inset-0 flex items-center justify-center gap-2 tracking-widest transition-transform group-hover:-translate-y-full">
+                                Mother's Day <ChevronRight size={16} />
+                            </span>
+                            <span className="absolute inset-0 flex items-center justify-center gap-2 tracking-widest translate-y-full transition-transform group-hover:translate-y-0 english-text">
+                                MOTHER'S DAY
+                            </span>
+                        </button>
+                        
+                        <button
+                            onClick={() => handleOrderStart('quick')}
                             className="group relative w-full md:w-64 h-14 bg-stone-800 text-white overflow-hidden transition-all hover:bg-stone-700"
                         >
                             <span className="absolute inset-0 flex items-center justify-center gap-2 tracking-widest transition-transform group-hover:-translate-y-full">
@@ -730,8 +833,10 @@ const App = () => {
                         {/* Header */}
                         <div className="sticky top-0 bg-white border-b border-stone-100 p-6 flex items-center justify-between z-10">
                             <div>
-                                <h3 className="text-xl tracking-widest text-stone-800 english-text">ORDER</h3>
-                                <p className="text-xs text-stone-500 mt-1 tracking-wider english-text">Step {orderStep} / 8</p>
+                                <h3 className="text-xl tracking-widest text-stone-800 english-text">
+                                    {orderType === 'mothers_day' ? "MOTHER'S DAY ORDER" : "ORDER"}
+                                </h3>
+                                <p className="text-xs text-stone-500 mt-1 tracking-wider english-text">Step {orderStep} / {maxSteps}</p>
                             </div>
                             <button onClick={() => setShowOrderModal(false)} className="text-stone-400 hover:text-stone-800 transition-colors">
                                 <X size={24} />
@@ -740,12 +845,404 @@ const App = () => {
 
                         {/* Progress Bar */}
                         <div className="h-1 bg-stone-100 w-full">
-                            <div className="h-full bg-stone-800 transition-all duration-500 ease-out" style={{ width: `${(orderStep / 8) * 100}%` }} />
+                            <div className="h-full bg-stone-800 transition-all duration-500 ease-out" style={{ width: `${(orderStep / maxSteps) * 100}%` }} />
                         </div>
 
                         {/* Content */}
                         <div className="p-8 min-h-[400px]">
-                            {/* Step 1: Purpose */}
+                            {orderType === 'mothers_day' && (
+                                <>
+                                    {/* Step 1: Payment */}
+                                    {orderStep === 1 && (
+                                        <div className="animate-in slide-in-from-right-4 duration-300">
+                                            <h4 className="text-lg mb-8 tracking-widest text-center">お支払いについて</h4>
+                                            <div className="max-w-md mx-auto bg-stone-50 p-6 rounded text-stone-700 tracking-wide text-sm leading-8 border border-stone-200">
+                                                <strong className="text-[#B68D8E] block mb-4 border-b border-stone-200 pb-2">
+                                                    ※こちらのフォームは【5/9、5/10 ご利用分限定】となります。<br />
+                                                    その他日程をご希望の際はクイックオーダーよりご注文ください。
+                                                </strong>
+                                                ・ご来店時や銀行お振込みでのお支払いとなります。<br />
+                                                ・クレジット等のお支払いをご希望の際は、Webshopの母の日専用アイテムよりご注文をお願いいたします。<br />
+                                                <a href="https://hanayaikka.stores.jp" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 underline">https://hanayaikka.stores.jp</a>
+                                            </div>
+                                            <div className="mt-8 flex justify-center">
+                                                <button
+                                                    onClick={() => setOrderData({ ...orderData, paymentConfirmed: !orderData.paymentConfirmed })}
+                                                    className={`border py-4 px-8 flex items-center gap-3 transition-colors ${orderData.paymentConfirmed ? 'bg-stone-800 text-white border-stone-800' : 'bg-white text-stone-500 border-stone-300 hover:border-stone-400'}`}
+                                                >
+                                                    <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${orderData.paymentConfirmed ? 'border-white bg-stone-800' : 'border-stone-300'}`}>
+                                                        {orderData.paymentConfirmed && <div className="w-2.5 h-2.5 rounded-full bg-white" />}
+                                                    </div>
+                                                    <span className="tracking-widest">確認しました</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Step 2: Budget */}
+                                    {orderStep === 2 && (
+                                        <div className="animate-in slide-in-from-right-4 duration-300">
+                                            <h4 className="text-lg mb-8 tracking-widest text-center">ご予算をお選びください</h4>
+                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-lg mx-auto">
+                                                {mothersDayBudgets.map((budget) => (
+                                                    <button
+                                                        key={budget.id}
+                                                        onClick={() => setOrderData({ ...orderData, budget: budget.id })}
+                                                        className={`py-6 border transition-all ${orderData.budget === budget.id
+                                                            ? 'border-stone-800 bg-stone-50 text-stone-800'
+                                                            : 'border-stone-200 text-stone-500 hover:border-stone-400'
+                                                            }`}
+                                                    >
+                                                        <div className="text-lg tracking-wider english-text">{budget.label}</div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            
+                                            {orderData.budget === 'other' && (
+                                                <div className="mt-4 animate-in fade-in max-w-lg mx-auto">
+                                                    <input
+                                                        type="text"
+                                                        value={orderData.budgetOther}
+                                                        onChange={(e) => setOrderData({ ...orderData, budgetOther: e.target.value })}
+                                                        placeholder="ご希望の予算をご記入ください"
+                                                        className="w-full p-4 border border-stone-300 focus:border-stone-800 outline-none text-stone-700 placeholder-stone-300 tracking-wide bg-transparent"
+                                                        autoFocus
+                                                    />
+                                                </div>
+                                            )}
+
+                                            <p className="text-xs text-red-500 text-center mt-6 tracking-wide font-bold">
+                                                ※ご注文は¥5,500以上からとなります
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {/* Step 3: Type */}
+                                    {orderStep === 3 && (
+                                        <div className="animate-in slide-in-from-right-4 duration-300">
+                                            <h4 className="text-lg mb-8 tracking-widest text-center">種類をお選びください</h4>
+                                            <div className="space-y-4 max-w-md mx-auto">
+                                                {[
+                                                    { id: 'arrangement', label: 'アレンジメント' },
+                                                    { id: 'bouquet', label: '花束' }
+                                                ].map((type) => (
+                                                    <button
+                                                        key={type.id}
+                                                        onClick={() => setOrderData({ ...orderData, type: type.id })}
+                                                        className={`w-full p-6 border transition-all flex items-center justify-between ${orderData.type === type.id
+                                                            ? 'border-stone-800 bg-stone-50 text-stone-800'
+                                                            : 'border-stone-200 text-stone-500 hover:border-stone-400'
+                                                            }`}
+                                                    >
+                                                        <span className="text-lg tracking-widest">{type.label}</span>
+                                                        {orderData.type === type.id && <Check size={18} />}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Step 4: Date */}
+                                    {orderStep === 4 && (
+                                        <div className="animate-in slide-in-from-right-4 duration-300">
+                                            <h4 className="text-lg mb-8 tracking-widest text-center">ご利用日をお選びください</h4>
+                                            <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
+                                                {[
+                                                    { id: '5/9', label: '5/9 (土)' },
+                                                    { id: '5/10', label: '5/10 (日)' }
+                                                ].map((dateOption) => (
+                                                    <button
+                                                        key={dateOption.id}
+                                                        onClick={() => setOrderData({ ...orderData, useDate: dateOption.id })}
+                                                        className={`py-6 border transition-all ${orderData.useDate === dateOption.id
+                                                            ? 'border-stone-800 bg-stone-50 text-stone-800'
+                                                            : 'border-stone-200 text-stone-500 hover:border-stone-400'
+                                                            }`}
+                                                    >
+                                                        <div className="text-lg tracking-wider english-text">{dateOption.label}</div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <p className="text-xs text-red-500 text-center mt-6 tracking-wide font-bold">
+                                                ＊上記以外の日程をご希望の際は、クイックオーダーよりご注文ください。
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {/* Step 5: Message Card */}
+                                    {orderStep === 5 && (
+                                        <div className="animate-in slide-in-from-right-4 duration-300">
+                                            <h4 className="text-lg mb-8 tracking-widest text-center">メッセージカード（立て札）</h4>
+                                            <div className="grid grid-cols-2 gap-4 mb-8">
+                                                <button
+                                                    onClick={() => setOrderData({ ...orderData, hasMessageCard: 'yes' })}
+                                                    className={`p-4 border transition-all text-center ${orderData.hasMessageCard === 'yes'
+                                                        ? 'border-stone-800 bg-stone-50 text-stone-800'
+                                                        : 'border-stone-200 text-stone-500 hover:border-stone-400'
+                                                        }`}
+                                                >
+                                                    <span className="tracking-widest">あり</span>
+                                                </button>
+                                                <button
+                                                    onClick={() => setOrderData({ ...orderData, hasMessageCard: 'no', messageCardText: '' })}
+                                                    className={`p-4 border transition-all text-center flex flex-col justify-center items-center ${orderData.hasMessageCard === 'no'
+                                                        ? 'border-stone-800 bg-stone-50 text-stone-800'
+                                                        : 'border-stone-200 text-stone-500 hover:border-stone-400'
+                                                        }`}
+                                                >
+                                                    <span className="tracking-widest">なし</span>
+                                                    <span className="text-[10px] text-stone-400 mt-1">（Thanks Momのカードをおつけします）</span>
+                                                </button>
+                                            </div>
+
+                                            {orderData.hasMessageCard === 'yes' && (
+                                                <div className="animate-in fade-in">
+                                                    <textarea
+                                                        value={orderData.messageCardText}
+                                                        onChange={(e) => setOrderData({ ...orderData, messageCardText: e.target.value })}
+                                                        placeholder="メッセージをご入力ください"
+                                                        rows={4}
+                                                        className="w-full p-4 border border-stone-300 focus:border-stone-800 outline-none text-stone-700 placeholder-stone-300 tracking-wide bg-transparent resize-none"
+                                                        autoFocus
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Step 6: Delivery */}
+                                    {orderStep === 6 && (
+                                        <div className="animate-in slide-in-from-right-4 duration-300">
+                                            <h4 className="text-lg mb-8 tracking-widest text-center">お受取方法</h4>
+                                            <div className="space-y-4 max-w-md mx-auto mb-8">
+                                                {deliveryOptions.map((option) => (
+                                                    <button
+                                                        key={option.id}
+                                                        onClick={() => setOrderData({ ...orderData, delivery: option.id, senderName: '', senderPhone: '', senderAddress: '', recipientName: '', recipientPhone: '', recipientAddress: '' })}
+                                                        className={`w-full p-6 border transition-all text-left group ${orderData.delivery === option.id
+                                                            ? 'border-stone-800 bg-stone-50 text-stone-800'
+                                                            : 'border-stone-200 text-stone-500 hover:border-stone-400'
+                                                            }`}
+                                                    >
+                                                        <div className="flex justify-between items-center">
+                                                            <div>
+                                                                <div className="text-lg tracking-widest mb-1">{option.label}</div>
+                                                                <div className="text-xs text-stone-400 group-hover:text-stone-500 whitespace-pre-wrap">{option.desc}</div>
+                                                            </div>
+                                                            {orderData.delivery === option.id && <Check size={18} />}
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                            </div>
+
+                                            {/* Detailed Input based on Delivery Choice */}
+                                            {orderData.delivery && (
+                                                <div className="space-y-8 animate-in fade-in bg-stone-50 p-6 rounded-lg">
+                                                    {/* Pickup Time Info */}
+                                                    {orderData.delivery === 'pickup' && (
+                                                        <div className="mb-8">
+                                                            <h5 className="text-sm tracking-widest mb-4 font-bold text-stone-700 border-b border-stone-200 pb-2">ご来店時間</h5>
+                                                            <div className="space-y-4">
+                                                                <select
+                                                                    value={orderData.useTime}
+                                                                    onChange={(e) => setOrderData({ ...orderData, useTime: e.target.value })}
+                                                                    className="w-full p-3 border border-stone-300 focus:border-stone-800 outline-none bg-white text-stone-700 tracking-wide"
+                                                                >
+                                                                    <option value="">時間を選択してください</option>
+                                                                    {mothersDayPickupTimes.map((time) => (
+                                                                        <option key={time} value={time}>{time}</option>
+                                                                    ))}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Sender Info */}
+                                                    <div>
+                                                        <h5 className="text-sm tracking-widest mb-4 font-bold text-stone-700 border-b border-stone-200 pb-2">ご依頼主様 (Requester)</h5>
+                                                        <div className="space-y-4">
+                                                            <div>
+                                                                <label className="block text-xs text-stone-500 mb-1 tracking-wide">お名前（フルネーム）</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={orderData.senderName}
+                                                                    onChange={(e) => setOrderData({ ...orderData, senderName: e.target.value })}
+                                                                    className="w-full p-3 border border-stone-300 focus:border-stone-800 outline-none bg-white"
+                                                                    placeholder="山田 太郎"
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-xs text-stone-500 mb-1 tracking-wide">電話番号</label>
+                                                                <input
+                                                                    type="tel"
+                                                                    value={orderData.senderPhone}
+                                                                    onChange={(e) => setOrderData({ ...orderData, senderPhone: e.target.value })}
+                                                                    className="w-full p-3 border border-stone-300 focus:border-stone-800 outline-none bg-white"
+                                                                    placeholder="090-1234-5678"
+                                                                />
+                                                            </div>
+                                                            {(orderData.delivery === 'sendai' || orderData.delivery === 'outside') && (
+                                                                <div>
+                                                                    <label className="block text-xs text-stone-500 mb-1 tracking-wide">ご住所</label>
+                                                                    <textarea
+                                                                        value={orderData.senderAddress}
+                                                                        onChange={(e) => setOrderData({ ...orderData, senderAddress: e.target.value })}
+                                                                        placeholder="〒000-0000 〇〇県〇〇市..."
+                                                                        rows={3}
+                                                                        className="w-full p-3 border border-stone-300 focus:border-stone-800 outline-none bg-white resize-none"
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Recipient Info */}
+                                                    {(orderData.delivery === 'sendai' || orderData.delivery === 'outside') && (
+                                                        <div>
+                                                            <h5 className="text-sm tracking-widest mb-4 font-bold text-stone-700 border-b border-stone-200 pb-2">お届け先 (Recipient)</h5>
+                                                            <div className="space-y-4">
+                                                                <div>
+                                                                    <label className="block text-xs text-stone-500 mb-1 tracking-wide">お名前（フルネーム）</label>
+                                                                    <input
+                                                                        type="text"
+                                                                        value={orderData.recipientName}
+                                                                        onChange={(e) => setOrderData({ ...orderData, recipientName: e.target.value })}
+                                                                        className="w-full p-3 border border-stone-300 focus:border-stone-800 outline-none bg-white"
+                                                                        placeholder="鈴木 花子"
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-xs text-stone-500 mb-1 tracking-wide">電話番号</label>
+                                                                    <input
+                                                                        type="tel"
+                                                                        value={orderData.recipientPhone}
+                                                                        onChange={(e) => setOrderData({ ...orderData, recipientPhone: e.target.value })}
+                                                                        className="w-full p-3 border border-stone-300 focus:border-stone-800 outline-none bg-white"
+                                                                        placeholder="080-9876-5432"
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-xs text-stone-500 mb-1 tracking-wide">ご住所</label>
+                                                                    <textarea
+                                                                        value={orderData.recipientAddress}
+                                                                        onChange={(e) => setOrderData({ ...orderData, recipientAddress: e.target.value })}
+                                                                        placeholder="〒000-0000 〇〇県〇〇市..."
+                                                                        rows={3}
+                                                                        className="w-full p-3 border border-stone-300 focus:border-stone-800 outline-none bg-white resize-none"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Delivery Time Info */}
+                                                    {orderData.delivery === 'sendai' && (
+                                                        <div className="mt-8">
+                                                            <p className="text-xs text-red-500 tracking-wide font-bold leading-relaxed">
+                                                                ＊市内配達は時間指定不可となります。<br />
+                                                                当日は必ずご在宅頂くようお伝えくださいませ。
+                                                            </p>
+                                                        </div>
+                                                    )}
+
+                                                    {orderData.delivery === 'outside' && (
+                                                        <div className="mt-8">
+                                                            <h5 className="text-sm tracking-widest mb-4 font-bold text-stone-700 border-b border-stone-200 pb-2">配送希望時間</h5>
+                                                            <select
+                                                                value={orderData.useTime}
+                                                                onChange={(e) => setOrderData({ ...orderData, useTime: e.target.value })}
+                                                                className="w-full p-3 border border-stone-300 focus:border-stone-800 outline-none bg-white text-stone-700 tracking-wide"
+                                                            >
+                                                                <option value="">時間を選択してください</option>
+                                                                {mothersDayOutsideTimes.map((time) => (
+                                                                    <option key={time} value={time}>{time}</option>
+                                                                ))}
+                                                            </select>
+                                                            <p className="text-xs text-red-500 mt-2 tracking-wide font-bold">
+                                                                ＊配送業者様も大変込み合うため、お時間ずれる可能性もございます。
+                                                            </p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Step 7: Confirmation */}
+                                    {orderStep === 7 && (
+                                        <div className="animate-in slide-in-from-right-4 duration-300">
+                                            <h4 className="text-lg mb-8 tracking-widest text-center">確認事項</h4>
+                                            <div className="max-w-md mx-auto bg-stone-50 p-6 rounded text-stone-700 tracking-wide text-sm leading-8 border border-stone-200">
+                                                ・お色味等はおまかせとなり、ikkaらしい優しい上品なイメージとなります。<br />
+                                                ・お届けの際は、必ずご在宅確認の上ご注文ください。<br />
+                                                ・再配達は対応いたしかねます。
+                                            </div>
+                                            <div className="mt-8 flex justify-center">
+                                                <button
+                                                    onClick={() => setOrderData({ ...orderData, confirmed: !orderData.confirmed })}
+                                                    className={`border py-4 px-8 flex items-center gap-3 transition-colors ${orderData.confirmed ? 'bg-stone-800 text-white border-stone-800' : 'bg-white text-stone-500 border-stone-300 hover:border-stone-400'}`}
+                                                >
+                                                    <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${orderData.confirmed ? 'border-white bg-stone-800' : 'border-stone-300'}`}>
+                                                        {orderData.confirmed && <div className="w-2.5 h-2.5 rounded-full bg-white" />}
+                                                    </div>
+                                                    <span className="tracking-widest">確認しました</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Step 8: Confirmation & Send */}
+                                    {orderStep === 8 && (
+                                        <div className="animate-in slide-in-from-right-4 duration-300">
+                                            <h4 className="text-lg mb-6 tracking-widest text-center">ご注文内容の確認</h4>
+                                            <div className="bg-stone-50 p-4 rounded text-sm whitespace-pre-wrap mb-6 font-mono text-stone-600 leading-relaxed max-h-[300px] overflow-y-auto">
+                                                {generateMessage()}
+                                            </div>
+                                            <p className="text-xs text-center text-stone-400 mb-6 tracking-wide">
+                                                送信方法をお選びください。<br />
+                                                ボタンを押すとアプリが起動します。
+                                            </p>
+                                            <div className="flex flex-col gap-3">
+                                                <button
+                                                    onClick={handleLineSend}
+                                                    className="w-full py-4 bg-[#06C755] text-white hover:opacity-90 transition-all tracking-widest flex items-center justify-center gap-2 rounded"
+                                                >
+                                                    LINEで送信
+                                                </button>
+                                                <button
+                                                    onClick={handleMailSend}
+                                                    className="w-full py-4 bg-stone-600 text-white hover:bg-stone-700 transition-all tracking-widest flex items-center justify-center gap-2 rounded"
+                                                >
+                                                    <Mail size={18} /> メールで送信
+                                                </button>
+                                                <button
+                                                    onClick={handleCopyContent}
+                                                    className="w-full py-4 bg-stone-200 text-stone-600 hover:bg-stone-300 transition-all tracking-widest flex items-center justify-center gap-2 rounded relative"
+                                                >
+                                                    {copySuccess ? (
+                                                        <>
+                                                            <Check size={18} className="text-green-600" />
+                                                            <span className="text-green-600">コピーしました！</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Copy size={18} /> 文章をコピー
+                                                        </>
+                                                    )}
+                                                </button>
+                                                <div className="text-[10px] text-stone-400 text-center leading-relaxed">
+                                                    ※メールが起動しない場合、「文章をコピー」を押してから<br />
+                                                    ご自身のメールアプリに貼り付けて送信してください。
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+
+                            {orderType === 'quick' && (
+                                <>
+                                    {/* Step 1: Purpose */}
                             {orderStep === 1 && (
                                 <div className="animate-in slide-in-from-right-4 duration-300">
                                     <h4 className="text-lg mb-8 tracking-widest text-center">用途をお選びください</h4>
@@ -1135,6 +1632,8 @@ const App = () => {
                                     </div>
                                 </div>
                             )}
+                                </>
+                            )}
                         </div>
 
                         {/* Footer */}
@@ -1147,7 +1646,7 @@ const App = () => {
                                     <ChevronLeft size={20} />
                                 </button>
                             )}
-                            {orderStep < 8 ? (
+                            {orderStep < maxSteps ? (
                                 <button
                                     onClick={handleNext}
                                     disabled={!isStepComplete()}
@@ -1179,10 +1678,67 @@ const App = () => {
                         </button>
                     ))}
                 </div>
+                <div className="mb-12">
+                    <button onClick={() => setShowTokushoho(true)} className="text-[10px] tracking-widest opacity-50 hover:opacity-100 transition-opacity">
+                        特定商取引法に基づく表記
+                    </button>
+                </div>
                 <p className="text-[10px] tracking-widest opacity-50 english-text">
-                    © 2026 HANAYA IKKA. ALL RIGHTS RESERVED. (v1.0.3)
+                    © 2026 HANAYA IKKA. ALL RIGHTS RESERVED. (v1.0.4)
                 </p>
             </footer>
+
+            {/* Tokushoho Modal */}
+            {showTokushoho && (
+                <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4">
+                    <div className="bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto relative animate-in fade-in zoom-in-95 duration-200">
+                        <div className="sticky top-0 bg-white border-b border-stone-100 p-4 flex justify-between items-center z-10">
+                            <h3 className="text-lg tracking-widest text-stone-800 font-bold">特定商取引法に基づく表記</h3>
+                            <button onClick={() => setShowTokushoho(false)} className="p-2 text-stone-400 hover:text-stone-800 transition-colors">
+                                <X size={24} />
+                            </button>
+                        </div>
+                        <div className="p-6 md:p-8 space-y-6 text-sm tracking-wide text-stone-700 leading-relaxed">
+                            <div>
+                                <h4 className="font-bold border-b border-stone-200 pb-2 mb-2">事業者の名称および連絡先</h4>
+                                <p><strong>代表者:</strong> Hanaya ikka</p>
+                                <p><strong>所在地:</strong> 〒980-0811 宮城県 仙台市青葉区一番町1-5-31 MIGNON一番町ﾋﾞﾙ3F-A</p>
+                                <p><strong>電話番号:</strong> 022-397-7552</p>
+                            </div>
+                            
+                            <div>
+                                <h4 className="font-bold border-b border-stone-200 pb-2 mb-2">販売価格</h4>
+                                <p>商品ごとにご案内する金額（表示価格/消費税込）と致します。</p>
+                            </div>
+
+                            <div>
+                                <h4 className="font-bold border-b border-stone-200 pb-2 mb-2">商品代金以外の必要料金</h4>
+                                <p>配送料・配達料が発生する場合がございます。<br/>・仙台市内配達: 880円（11,000円以上の商品で無料）<br/>・市外・県外配送: 1,980円〜（サイズ等により異なります）</p>
+                            </div>
+
+                            <div>
+                                <h4 className="font-bold border-b border-stone-200 pb-2 mb-2">支払時期</h4>
+                                <p>・クレジットカード決済：ご注文確定時に決済URLを発行いたします。<br/>・銀行振込、店頭支払い：ご注文時にお知らせする期日までにお支払いください。</p>
+                            </div>
+
+                            <div>
+                                <h4 className="font-bold border-b border-stone-200 pb-2 mb-2">支払方法</h4>
+                                <p>クレジットカード決済、銀行振込、店頭でのお支払い（現金・キャッシュレス等）をご利用いただけます。</p>
+                            </div>
+
+                            <div>
+                                <h4 className="font-bold border-b border-stone-200 pb-2 mb-2">商品の引渡時期</h4>
+                                <p>ご指定いただいたご利用日・受け取り日に合わせてご用意・発送いたします。具体的な日程はオーダー確定時のやりとりにて決定いたします。</p>
+                            </div>
+
+                            <div>
+                                <h4 className="font-bold border-b border-stone-200 pb-2 mb-2">返品・キャンセルに関する特約</h4>
+                                <p>生花という商品の性質上、原則としてお客様都合による返品・交換・キャンセルはお受けできかねます。商品の品質には万全を期しておりますが、万が一商品に明らかな欠陥があった場合は、お受取後速やかにご連絡ください。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div >
     );
 };
