@@ -53,7 +53,6 @@ const App = () => {
 
     // Gallery Modal State
     const [selectedCategory, setSelectedCategory] = useState(null);
-    const [showTokushoho, setShowTokushoho] = useState(false);
 
     const [orderType, setOrderType] = useState('quick'); // 'quick' | 'mothers_day'
     const maxSteps = 8;
@@ -215,7 +214,7 @@ const App = () => {
     const deliveryOptions = [
         { id: 'pickup', label: '来店', desc: '店頭でのお受け取り' },
         { id: 'sendai', label: '配達（仙台市内）', desc: '仙台市内への配達\n＊別途配達料 ¥880\n＊¥11,000以上は配達料無料' },
-        { id: 'outside', label: '市外県外配送', desc: '仙台市外・県外への配送\n＊別途配送料¥1,980〜（サイズにより異なります）' }
+        { id: 'outside', label: '市外県外配送', desc: '仙台市外・県外への配送\n＊別途配送料¥1,760〜（サイズにより異なります）' }
     ];
 
     const timeOptions = [
@@ -1679,66 +1678,14 @@ const App = () => {
                     ))}
                 </div>
                 <div className="mb-12">
-                    <button onClick={() => setShowTokushoho(true)} className="text-[10px] tracking-widest opacity-50 hover:opacity-100 transition-opacity">
+                    <a href="/tokushoho.html" target="_blank" rel="noopener noreferrer" className="text-[10px] tracking-widest opacity-50 hover:opacity-100 transition-opacity">
                         特定商取引法に基づく表記
-                    </button>
+                    </a>
                 </div>
                 <p className="text-[10px] tracking-widest opacity-50 english-text">
                     © 2026 HANAYA IKKA. ALL RIGHTS RESERVED. (v1.0.4)
                 </p>
             </footer>
-
-            {/* Tokushoho Modal */}
-            {showTokushoho && (
-                <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4">
-                    <div className="bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto relative animate-in fade-in zoom-in-95 duration-200">
-                        <div className="sticky top-0 bg-white border-b border-stone-100 p-4 flex justify-between items-center z-10">
-                            <h3 className="text-lg tracking-widest text-stone-800 font-bold">特定商取引法に基づく表記</h3>
-                            <button onClick={() => setShowTokushoho(false)} className="p-2 text-stone-400 hover:text-stone-800 transition-colors">
-                                <X size={24} />
-                            </button>
-                        </div>
-                        <div className="p-6 md:p-8 space-y-6 text-sm tracking-wide text-stone-700 leading-relaxed">
-                            <div>
-                                <h4 className="font-bold border-b border-stone-200 pb-2 mb-2">事業者の名称および連絡先</h4>
-                                <p><strong>代表者:</strong> Hanaya ikka</p>
-                                <p><strong>所在地:</strong> 〒980-0811 宮城県 仙台市青葉区一番町1-5-31 MIGNON一番町ﾋﾞﾙ3F-A</p>
-                                <p><strong>電話番号:</strong> 022-397-7552</p>
-                            </div>
-                            
-                            <div>
-                                <h4 className="font-bold border-b border-stone-200 pb-2 mb-2">販売価格</h4>
-                                <p>商品ごとにご案内する金額（表示価格/消費税込）と致します。</p>
-                            </div>
-
-                            <div>
-                                <h4 className="font-bold border-b border-stone-200 pb-2 mb-2">商品代金以外の必要料金</h4>
-                                <p>配送料・配達料が発生する場合がございます。<br/>・仙台市内配達: 880円（11,000円以上の商品で無料）<br/>・市外・県外配送: 1,980円〜（サイズ等により異なります）</p>
-                            </div>
-
-                            <div>
-                                <h4 className="font-bold border-b border-stone-200 pb-2 mb-2">支払時期</h4>
-                                <p>・クレジットカード決済：ご注文確定時に決済URLを発行いたします。<br/>・銀行振込、店頭支払い：ご注文時にお知らせする期日までにお支払いください。</p>
-                            </div>
-
-                            <div>
-                                <h4 className="font-bold border-b border-stone-200 pb-2 mb-2">支払方法</h4>
-                                <p>クレジットカード決済、銀行振込、店頭でのお支払い（現金・キャッシュレス等）をご利用いただけます。</p>
-                            </div>
-
-                            <div>
-                                <h4 className="font-bold border-b border-stone-200 pb-2 mb-2">商品の引渡時期</h4>
-                                <p>ご指定いただいたご利用日・受け取り日に合わせてご用意・発送いたします。具体的な日程はオーダー確定時のやりとりにて決定いたします。</p>
-                            </div>
-
-                            <div>
-                                <h4 className="font-bold border-b border-stone-200 pb-2 mb-2">返品・キャンセルに関する特約</h4>
-                                <p>生花という商品の性質上、原則としてお客様都合による返品・交換・キャンセルはお受けできかねます。商品の品質には万全を期しておりますが、万が一商品に明らかな欠陥があった場合は、お受取後速やかにご連絡ください。</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div >
     );
 };
