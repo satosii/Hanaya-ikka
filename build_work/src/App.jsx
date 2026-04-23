@@ -172,7 +172,7 @@ const App = () => {
     ];
 
     const mothersDayOutsideTimes = [
-        "午前中", "14〜16時", "16〜18時", "18〜20時", "19〜21時"
+        "午前中", "14〜16時", "16〜18時", "18〜20時", "19〜21時", "指定なし"
     ];
 
     const purposes = [
@@ -214,7 +214,7 @@ const App = () => {
     const deliveryOptions = [
         { id: 'pickup', label: '来店', desc: '店頭でのお受け取り' },
         { id: 'sendai', label: '配達（仙台市内）', desc: '仙台市内への配達\n＊別途配達料 ¥880\n＊¥11,000以上は配達料無料' },
-        { id: 'outside', label: '市外県外配送', desc: '仙台市外・県外への配送\n＊別途配送料¥1,760〜（サイズにより異なります）' }
+        { id: 'outside', label: '市外県外配送', desc: '仙台市外・県外への配送\n＊別途配送料: ¥5,500は¥1,980 / ¥7,700は¥2,200 / ¥11,000は¥2,420' }
     ];
 
     const timeOptions = [
@@ -340,10 +340,19 @@ const App = () => {
             const messageCardInfo = orderData.hasMessageCard === 'yes' ? `あり\nメッセージ内容：${orderData.messageCardText}` : 'なし（Thanks Momのカードをおつけします）';
 
             let timeInfo = '';
+            let shippingFeeInfo = '';
             if (orderData.delivery === 'pickup' && orderData.useTime) {
                 timeInfo = `\nご来店時間: ${orderData.useTime}`;
-            } else if (orderData.delivery === 'outside' && orderData.useTime) {
-                timeInfo = `\n配送希望時間: ${orderData.useTime}`;
+            } else if (orderData.delivery === 'sendai') {
+                shippingFeeInfo = (orderData.budget === '11000' || orderData.budget === 'other') ? '' : '\n配達料: ¥880';
+            } else if (orderData.delivery === 'outside') {
+                if (orderData.useTime) {
+                    timeInfo = `\n配送希望時間: ${orderData.useTime}`;
+                }
+                if (orderData.budget === '5500') shippingFeeInfo = '\n配送料: ¥1,980';
+                else if (orderData.budget === '7700') shippingFeeInfo = '\n配送料: ¥2,200';
+                else if (orderData.budget === '11000') shippingFeeInfo = '\n配送料: ¥2,420';
+                else shippingFeeInfo = '\n配送料: 別途ご案内';
             }
 
             return `【Mother's Day】
@@ -353,7 +362,7 @@ const App = () => {
 種類: ${typeLabel}
 ご利用日: ${useDateLabel}
 メッセージカード: ${messageCardInfo}
-受取方法: ${deliveryLabel}${timeInfo}${deliveryDetails}
+受取方法: ${deliveryLabel}${timeInfo}${shippingFeeInfo}${deliveryDetails}
 
 ※確認事項に同意済み
 ※ご注文確認後、追ってご連絡させていただきます。
