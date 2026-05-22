@@ -139,10 +139,10 @@ const App = () => {
             display7
         ],
         "Stand Flower": [
-            stand4,
-            stand1,
             stand2,
-            stand3
+            stand3,
+            stand4,
+            stand1
         ]
     };
 
