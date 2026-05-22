@@ -513,7 +513,7 @@ const App = () => {
                         <h2 className="text-4xl md:text-5xl tracking-widest font-light english-text">Services</h2>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-12 md:gap-16">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-16">
                         {[
                             {
                                 title: 'Bouquet & Arrangement',
@@ -551,6 +551,17 @@ const App = () => {
                                         少人数の完全予約制です。<br />
                                         もちろん未経験、お一人様でも。<br />
                                         是非お気軽にご参加ください。
+                                    </>
+                                )
+                            },
+                            {
+                                title: 'Regular display',
+                                desc: '定期装花',
+                                detail: (
+                                    <>
+                                        オフィスやクリニック、美容室や飲食店等、様々な場面で定期装花を承っております。<br />
+                                        季節のお花をディスプレイ、定期的に交換、メンテナンスを行います。<br />
+                                        料金や交換頻度等、お気軽にご相談ください。
                                     </>
                                 )
                             }
