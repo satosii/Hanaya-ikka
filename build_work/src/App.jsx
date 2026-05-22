@@ -8,6 +8,8 @@ import display2 from './assets/display_2.jpg';
 import display3 from './assets/display_3.jpg';
 import display4 from './assets/display_4.jpg';
 import display5 from './assets/display_5.jpg';
+import display6 from './assets/display_6.jpg';
+import display7 from './assets/display_7.jpg';
 import arrangementEnd1 from './assets/arrangement_end_1.jpg';
 import arrangementEnd2 from './assets/arrangement_end_2.jpg';
 import arrangementEnd3 from './assets/arrangement_end_3.jpg';
@@ -128,7 +130,9 @@ const App = () => {
             display2,
             display3,
             display4,
-            display5
+            display5,
+            display6,
+            display7
         ]
     };
 
