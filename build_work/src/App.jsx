@@ -3,6 +3,11 @@ import { Menu, X, MapPin, Phone, Clock, ChevronRight, ChevronLeft, Check, Mail, 
 
 import weddingNew from './assets/wedding_new.jpg';
 import arrangementNew from './assets/arrangement_new.jpg';
+import display1 from './assets/display_1.jpg';
+import display2 from './assets/display_2.jpg';
+import display3 from './assets/display_3.jpg';
+import display4 from './assets/display_4.jpg';
+import display5 from './assets/display_5.jpg';
 import arrangementEnd1 from './assets/arrangement_end_1.jpg';
 import arrangementEnd2 from './assets/arrangement_end_2.jpg';
 import arrangementEnd3 from './assets/arrangement_end_3.jpg';
@@ -117,6 +122,13 @@ const App = () => {
             weddingEnd1,
             weddingEnd2,
             weddingEnd3
+        ],
+        "いけこみ & Disply": [
+            display1,
+            display2,
+            display3,
+            display4,
+            display5
         ]
     };
 
