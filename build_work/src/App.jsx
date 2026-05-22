@@ -10,6 +10,10 @@ import display4 from './assets/display_4.jpg';
 import display5 from './assets/display_5.jpg';
 import display6 from './assets/display_6.jpg';
 import display7 from './assets/display_7.jpg';
+import stand1 from './assets/stand_1.jpg';
+import stand2 from './assets/stand_2.jpg';
+import stand3 from './assets/stand_3.jpg';
+import stand4 from './assets/stand_4.jpg';
 import arrangementEnd1 from './assets/arrangement_end_1.jpg';
 import arrangementEnd2 from './assets/arrangement_end_2.jpg';
 import arrangementEnd3 from './assets/arrangement_end_3.jpg';
@@ -133,6 +137,12 @@ const App = () => {
             display5,
             display6,
             display7
+        ],
+        "Stand Flower": [
+            stand1,
+            stand2,
+            stand3,
+            stand4
         ]
     };
 
